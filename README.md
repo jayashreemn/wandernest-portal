@@ -94,7 +94,7 @@ This project is a full-stack web application developed as a clone of Airbnb usin
 
 - **Responsive Design:** The application is designed to be responsive and work seamlessly across different devices.
 
-  !(client/public/assets/hero.png)
+  ![Airbnb Logo](client/public/assets/hero.png)
 
 ## Technologies Used
 
