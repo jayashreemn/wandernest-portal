@@ -73,6 +73,8 @@ This project is a full-stack web application developed as a clone of Airbnb usin
 - **Google Login:** Users can sign up and log in using their gmail.
 
   ![Airbnb Logo](client/public/assets/auth.png)
+  
+  ![Airbnb Logo](client/public/assets/register.png)
 
 - **Search Listings:** Users can search for accommodations.
 
