@@ -131,7 +131,7 @@ exports.uploadPicture = async (req, res) => {
 // update user
 exports.updateUserDetails = async (req, res) => {
   try {
-    const { name, password, email, picture } = req.body
+    const { name, email, picture } = req.body
 
     const user = await User.findOne({ email })
 
@@ -141,19 +141,28 @@ exports.updateUserDetails = async (req, res) => {
       })
     }
 
-    // user can update only name, only password,only profile pic or all three
-
-    user.name = name
-    if (picture && !password) {
-      user.picture = picture
-    } else if (password && !picture) {
-      user.password = password
-    } else {
-      user.picture = picture
-      user.password = password
+    // Update name if provided
+    if (name && name.trim() !== '') {
+      user.name = name
     }
+
+    // Update picture only if provided and not empty
+    if (picture && picture.trim() !== '') {
+      user.picture = picture
+    }
+
     const updatedUser = await user.save()
-    cookieToken(updatedUser, res)
+    
+    // Return full user object for real-time update
+    res.status(200).json({
+      success: true,
+      user: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        picture: updatedUser.picture
+      }
+    })
   } catch (error) {
     res.status(500).json({ message: "Internal server error" }, error)
   }

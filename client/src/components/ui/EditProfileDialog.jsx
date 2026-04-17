@@ -7,6 +7,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { setItemsInLocalStorage } from '@/utils';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,10 +21,9 @@ const EditProfileDialog = () => {
   const uploadRef = useRef(null);
   const [picture, setPicture] = useState('');
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
   const [userData, setUserData] = useState({
     name: user.name,
-    password: '',
-    confirm_password: '',
   });
 
   const handleImageClick = () => {
@@ -42,47 +42,55 @@ const EditProfileDialog = () => {
 
   const handleSaveChanges = async () => {
     setLoading(true);
-    const { name, password, confirm_password } = userData;
+    const { name } = userData;
 
     // Validation
     if (name.trim() === '') {
       setLoading(false);
       return toast.error("Name Can't be empty");
-    } else if (password !== confirm_password) {
-      setLoading(false);
-      return toast.error("Passwords don't match");
     }
 
     try {
       // first check if picture has been updated or not
-      let pictureUrl = '';
+      let pictureUrl = user.picture; // Keep existing picture by default
       if (picture) {
         // upload picture and save the image url
         pictureUrl = await uploadPicture(picture);
       }
 
+      // Only include fields that have actual values
       const userDetails = {
         name: userData.name,
-        password: userData.password,
-        picture: pictureUrl,
       };
+      
+      // Only add picture if it's different from current
+      if (pictureUrl) {
+        userDetails.picture = pictureUrl;
+      }
 
+      console.log('Sending to backend:', userDetails); // Debug log
       const res = await updateUser(userDetails);
-      if (res.success) {
+      console.log('Response from backend:', res); // Debug log
+      
+      if (res && res.success) {
         setUser(res.user);
+        // Update localStorage with new user data
+        setItemsInLocalStorage('user', res.user);
+        setOpen(false); // Close the dialog
+        setPicture(''); // Reset picture state
         setLoading(false);
         return toast.success('Updated successfully!');
       }
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      console.log('Error:', error);
       toast.error('Something went wrong!');
       setLoading(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-600 ">
           <PenSquare className="mr-2 h-4 w-4" />
@@ -132,32 +140,7 @@ const EditProfileDialog = () => {
               onChange={handleUserData}
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="password" className="text-right">
-              New Password
-            </Label>
-            <Input
-              id="password"
-              name="password"
-              value={userData.password}
-              className="col-span-3"
-              type="password"
-              onChange={handleUserData}
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="confirm_Password" className="text-right">
-              Confirm Password
-            </Label>
-            <Input
-              id="confirm_password"
-              name="confirm_password"
-              value={userData.confirm_password}
-              className="col-span-3"
-              type="password"
-              onChange={handleUserData}
-            />
-          </div>
+
         </div>
         <DialogFooter>
           <Button

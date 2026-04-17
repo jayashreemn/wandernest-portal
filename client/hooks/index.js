@@ -117,11 +117,11 @@ export const useProvideAuth = () => {
     }
 
     const updateUser = async (userDetails) => {
-        const { name, password, picture } = userDetails;
+        const { name, picture } = userDetails;
         const email = JSON.parse(getItemFromLocalStorage('user')).email
         try {
             const { data } = await axiosInstance.put('/user/update-user', {
-                name, password, email, picture
+                name, email, picture
             })
             return data;
         } catch (error) {
