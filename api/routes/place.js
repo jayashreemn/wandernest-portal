@@ -8,7 +8,8 @@ const {
   updatePlace,
   singlePlace,
   userPlaces,
-  searchPlaces
+  searchPlaces,
+  filterPlaces
 } = require('../controllers/placeController');
 
 router.route('/').get(getPlaces);
@@ -19,6 +20,7 @@ router.route('/user-places').get(isLoggedIn, userPlaces);
 router.route('/update-place').put(isLoggedIn, updatePlace);
 
 // Not Protected routed but sequence should not be interfered with above routes
+router.route('/filter').get(filterPlaces);
 router.route('/:id').get(singlePlace);
 router.route('/search/:key').get(searchPlaces)
 

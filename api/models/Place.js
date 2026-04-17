@@ -28,6 +28,14 @@ const placeSchema = new mongoose.Schema({
   price: {
     type: Number,
   },
+  bedrooms: {
+    type: Number,
+    default: 1,
+  },
+  bathrooms: {
+    type: Number,
+    default: 1,
+  },
 });
 
 const Place = mongoose.model("Place", placeSchema);

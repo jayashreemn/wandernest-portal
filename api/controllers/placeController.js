@@ -142,3 +142,68 @@ exports.searchPlaces = async (req, res) => {
     });
   }
 }
+
+// Filter Places based on criteria
+exports.filterPlaces = async (req, res) => {
+  try {
+    const { minPrice, maxPrice, minRating, bedrooms, bathrooms, location } = req.query;
+    
+    // Build filter object
+    let filter = {};
+
+    // Price filter
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = parseInt(minPrice);
+      if (maxPrice) filter.price.$lte = parseInt(maxPrice);
+    }
+
+    // Bedrooms filter
+    if (bedrooms) {
+      filter.bedrooms = parseInt(bedrooms);
+    }
+
+    // Bathrooms filter
+    if (bathrooms) {
+      filter.bathrooms = parseInt(bathrooms);
+    }
+
+    // Location filter (search in address)
+    if (location) {
+      filter.address = { $regex: location, $options: "i" };
+    }
+
+    // Get places based on filter
+    let places = await Place.find(filter);
+
+    // Apply rating filter (requires aggregation with reviews)
+    if (minRating) {
+      const Review = require('../models/Review');
+      const minRatingNum = parseInt(minRating);
+      
+      // Get average ratings for all places
+      const ratingsAgg = await Review.aggregate([
+        {
+          $group: {
+            _id: '$place',
+            avgRating: { $avg: '$rating' }
+          }
+        },
+        {
+          $match: { avgRating: { $gte: minRatingNum } }
+        }
+      ]);
+
+      const placeIdsWithGoodRating = ratingsAgg.map(r => r._id.toString());
+      places = places.filter(place => placeIdsWithGoodRating.includes(place._id.toString()));
+    }
+
+    res.status(200).json(places);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Internal server error',
+      error: err,
+    });
+  }
+}

@@ -25,6 +25,8 @@ const PlacesFormPage = () => {
     checkOut: '',
     maxGuests: 10,
     price: 500,
+    bedrooms: 1,
+    bathrooms: 1,
   });
 
   const {
@@ -37,6 +39,8 @@ const PlacesFormPage = () => {
     checkOut,
     maxGuests,
     price,
+    bedrooms,
+    bathrooms,
   } = formData;
 
   const isValidPlaceData = () => {
@@ -203,19 +207,40 @@ const PlacesFormPage = () => {
         />
 
         {preInput(
-          'Number of guests & Price',
-          // 'add check in and out times, remember to have some time window forcleaning the room between guests. '
-          'Specify the maximum number of guests so that the client stays within the limit.',
+          'Number of guests, bedrooms, bathrooms & Price',
+          'Specify the maximum number of guests, bedrooms, and bathrooms.',
         )}
         <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-4">
           <div>
             <h3 className="mt-2 -mb-1">Max no. of guests</h3>
             <input
-              type="text"
+              type="number"
               name="maxGuests"
               value={maxGuests}
               onChange={handleFormData}
               placeholder="1"
+            />
+          </div>
+          <div>
+            <h3 className="mt-2 -mb-1">Bedrooms</h3>
+            <input
+              type="number"
+              name="bedrooms"
+              value={bedrooms}
+              onChange={handleFormData}
+              placeholder="1"
+              min="1"
+            />
+          </div>
+          <div>
+            <h3 className="mt-2 -mb-1">Bathrooms</h3>
+            <input
+              type="number"
+              name="bathrooms"
+              value={bathrooms}
+              onChange={handleFormData}
+              placeholder="1"
+              min="1"
             />
           </div>
           <div>
